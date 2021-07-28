@@ -15,8 +15,14 @@ class PhotoController extends Controller
      */
     public function index()
     {
-        $photos  = Photo:: all();
+        $photos  = Photo::all();
         return view('/pages/home', ['photos' =>$photos]);
+    }
+
+    public function ShowAll()
+    {
+        $photos  = Photo::all();
+        return view('/pages/photo_list', ['photos' =>$photos]);
     }
 
     /**
@@ -92,7 +98,9 @@ class PhotoController extends Controller
 
         //alterando no banco de dados
         $photo->update();
-        return redirect('/');
+
+        //redirecionando para a página de fotos
+        return redirect('/photos');
     }
 
     /**
