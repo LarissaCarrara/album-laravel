@@ -14,7 +14,7 @@ extends('/layouts/main')
       <div class="card shadow bg-white rounded">
         <div class="card-header gradient text-white">
           <h2 class="card-title p-3"> <i class="fas fa-image"></i>
-          Fotos Cadastradas
+            Fotos Cadastradas
           </h2>
         </div>
         <div class="card-body p-4">
@@ -29,11 +29,12 @@ extends('/layouts/main')
               </tr>
             </thead>
             <tbody>
-            @foreach ($photos as $photo)
+              @foreach ($photos as $photo)
               <tr class="align-middle">
                 <td>{{$photo->id}}</td>
                 <td>
-                <img width= "200" class="img-thumbnail" src="https://www.osmais.com/wallpapers/201209/dia-de-chuva-wallpaper.jpg" alt="">
+                  <img width="200" class="img-thumbnail"
+                    src="https://www.osmais.com/wallpapers/201209/dia-de-chuva-wallpaper.jpg" alt="">
                 </td>
                 <td>{{$photo->title}}</td>
                 <td>{{$photo->date}}</td>
@@ -41,7 +42,14 @@ extends('/layouts/main')
                   <a href="/photos/edit/{{photo->id}}" class="btn btn-secondary">
                     <i class="fas fa-edit"></i>
                   </a>
-                  <button class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+
+                  <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#confirmationModal" data-photo-id="{{photo->id}}">
+
+                    <i class="fas fa-trash-alt"></i>
+
+                  </button>
+
                 </td>
               </tr>
               @endforeach
@@ -56,4 +64,47 @@ extends('/layouts/main')
   </div><!-- fim da row -->
 </div><!-- fim do container -->
 
+<!-- Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> <button type="button" class="btn-close"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body"> ...
+      </div>
+      <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        <form action="/photos/" method="POST" id="formDeletePhoto">
+          @method('DELETE')
+          @csrf
+
+          <button class="btn btn-danger" type="submit">
+            Sim, excluir
+
+          </button>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  //variavel que recebe o elemento html(modal)
+  var exampleModal = document.getElementById('confirmationModal')
+
+  //adiciona um evento, toda vez que o modal for aberto
+  exampleModal.addEventListener('show.bs.modal', function (event) {
+
+  var button = event.relatedTarget
+
+  var form = document.getElementById('formDeletePhoto')
+  form.action = "/photos/" + button.getAttribute('data-photo-id')
+
+})
+
+</script>
 @endsection
