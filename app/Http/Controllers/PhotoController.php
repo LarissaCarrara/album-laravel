@@ -112,7 +112,7 @@ class PhotoController extends Controller
     public function destroy($id)
     {
         //retorna e exclui a foto do bando de dados
-        $photo =  Photo::FindOrFail($id)->delete();
+        Photo::FindOrFail($id)->delete();
 
 
         //redirecionar para a página de fotos

@@ -7,10 +7,10 @@ extends('/layouts/main')
     <!-- Coluna Btn voltar -->
     <div class="col-12 my-4">
       <a href="/"><i class="fas fa-arrow-left me-2"></i>Voltar</a>
-    </div> <!-- Coluna Card da Tabela -->
+    </div>
 
-
-    <div class="col-12">
+    <!-- Coluna Card da Tabela -->
+    <div class="col-12 mb-5">
       <div class="card shadow bg-white rounded">
         <div class="card-header gradient text-white">
           <h2 class="card-title p-3"> <i class="fas fa-image"></i>
@@ -69,12 +69,12 @@ extends('/layouts/main')
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> <button type="button" class="btn-close"
+        <h5 class="modal-title" id="exampleModalLabel">Atenção!</h5> <button type="button" class="btn-close"
           data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body"> ...
+      <div class="modal-body"> Deseja realmente excluir essa foto?
       </div>
-      <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
         <form action="/photos/" method="POST" id="formDeletePhoto">
           @method('DELETE')
@@ -92,19 +92,7 @@ extends('/layouts/main')
   </div>
 </div>
 
-<script>
-  //variavel que recebe o elemento html(modal)
-  var exampleModal = document.getElementById('confirmationModal')
+<!-- Script personalizado -->
+<script src= "{{asset('/js/script.js')}}"> </script>
 
-  //adiciona um evento, toda vez que o modal for aberto
-  exampleModal.addEventListener('show.bs.modal', function (event) {
-
-  var button = event.relatedTarget
-
-  var form = document.getElementById('formDeletePhoto')
-  form.action = "/photos/" + button.getAttribute('data-photo-id')
-
-})
-
-</script>
 @endsection
