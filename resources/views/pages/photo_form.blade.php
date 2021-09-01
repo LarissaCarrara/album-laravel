@@ -3,128 +3,86 @@
 @include('/partials/navbar')
 <div class="container">
 
-<!-- Bnt botão -->
+  <!-- Coluna Btn voltar -->
   <div class="row">
     <div class="col-12 my-4">
-      <a href="/"><i class="fas fa-arrow-left"></i> Voltar</a>
+      <a href="/"><i class="fas fa-arrow-left me-2"></i>Voltar</a>
     </div>
-  <!-- Coluna Card form -->
+    <!-- Coluna Card form -->
     <div class="col-12">
       <div class="card shadow bg-white rounded">
         <div class="card-header gradient text-white">
-          <h2 class="card-title"><i class="fas fa-image"></i> {{ isset($photo) ? 'Alterar foto' : 'Nova foto'}}</h2>
+          <h2 class="card-title p-3"><i class="fas fa-image"></i>{{isset($photo) ? 'Alterar Foto':'Nova Foto'}}</h2>
         </div>
-
         <div class="card-body p-4">
         <!-- Form -->
-        @if (isset($photo))
+          @if (isset($photo))
             <form action="/photos/{{$photo->id}}" method="POST">
             @method('PUT')
           @else
             <form action="/photos" method="POST" enctype="multipart/form-data">
           @endif
-
           @csrf
-          <div class="p-md-3">
 
-
-
-
-              <div class="row">
-
+            <div class="row">
               <!-- Coluna da foto -->
-                <div class="col-lg-6">
-                  <div class="d-flex flex-column h-100">
-                    <div id= "imgPrev"
-                      class="miniatura img-thumbnail d-flex flex-column justify-content-center align-items-center h-100 mt-4">
-                       <!-- <i class="far fa-image"></i> -->
-                      <!-- <img id="imgPrev" class= "img-fluid" src= "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.magazineluiza.com.br%2Fquadro-decorativo-lua-noite-lago-arvores-paisagem-natureza-decoracoes-com-moldura-vital-quadros%2Fp%2Fjj5e62h55b%2Fde%2Fqdec%2F&psig=AOvVaw3wxlW1QpZGzTzD1596_mm0&ust=1630534494438000&source=images&cd=vfe&ved=0CAkQjRxqFwoTCOirlb-k3PICFQAAAAAdAAAAABAD" /> -->
-
-
-
-                    </div>
-                    <div class="form-group mt-2">
-                      <div class="custom-file">
-                        <input id= "photo" name= "photo" type="file" class="custom-file-input" onchange="loadFile(event)" >
-
-                      </div>
+              <div class="col-lg-6">
+                <div class="d-flex flex-column h-100">
+                  <div
+                    class="miniatura img-thumbnail d-flex flex-column justify-content-center align-items-center h-100 mt-4">
+                    <img id="imgPrev" height="340"
+                         class="w-100"
+                         style="object-fit: cover;" src="{{asset('/img/img_padrao.png')}}" alt="">
+                  </div>
+                  <div class="form-group mt-2">
+                    <div class="custom-file">
+                      <input id="photo" name="photo" type="file" class="custom-file-input" onchange="loadFile(event)">
                     </div>
                   </div>
                 </div>
+              </div><!-- fim da coluna da foto -->
 
-                <!-- Título -->
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="text">Título</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <div class="input-group-text">
-                          <i class="fas fa-image"></i>
-                        </div>
-                      </div>
-                      <input id="title" name="title" type="text" class="form-control" required
-                        placeholder="Digite o título da sua imagem" value=" {{$photo->title ?? null}}">
+              <!-- coluna das inputs -->
+              <div class="col-lg-6">
+                <!-- Titulo -->
+                <div class="form-group">
+                  <label for="title">Título</label>
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <i class="fas fa-image"></i>
                     </div>
-                  </div>
-
-                  <!-- data -->
-                  <div class="form-group">
-                    <label for="text">Data</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <div class="input-group-text">
-                          <i class="far fa-calendar-alt"></i>
-                        </div>
-                      </div>
-                      <input id="date" name="date" type="date" class="form-control" required value="{{$photo->date ?? null}}">
-                    </div>
-                  </div>
-
-                    <!-- descrição -->
-                  <div class="form-group">
-                    <label for="textarea">Descrição</label>
-                    <textarea id="description" name="description" cols="40" rows="5" class="form-control" required
-                      placeholder="Digite uma pequena descrição da imagem"> {{$photo->description ?? null}}</textarea>
-                  </div>
-                  <div class="form-group d-flex">
-                    <button name="submit" type="submit" class="btn btn-laranja">Limpar</button>
-                    <button name="submit" type="submit" class="btn btn-primary">Salvar</button>
+                    <input id="title" name="title" type="text" class="form-control" required placeholder="Digite o título da sua imagem" value="{{$photo->title ?? null}}">
                   </div>
                 </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                <!-- Data -->
+                <div class="form-group mt-3">
+                  <label for="date">Data</label>
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <i class="far fa-calendar-alt"></i>
+                    </div>
+                    <input id="date" name="date" type="date" class="form-control"required value="{{$photo->date ?? null}}">
+                  </div>
+                </div>
+                <!-- Descrição -->
+                <div class="form-group mt-3">
+                  <label for="description">Descrição</label>
+                  <textarea id="description" name="description" cols="40" rows="5" class="form-control" required placeholder="Digite uma pequena descrição da imagem">{{$photo->description ?? null}}</textarea>
+                </div>
+                <!-- Botões -->
+                <div class="form-group d-flex mt-3">
+                  <button name="submit" type="reset" class="btn btn-laranja flex-grow-1 me-2">Limpar</button>
+                  <button name="submit" type="submit" class="btn btn-primary flex-grow-1">Salvar</button>
+                </div>
+              </div><!-- fim coluna das inputs-->
+            </div><!-- fim da row -->
+          </form><!-- fim do form -->
+        </div><!-- fim do card-body -->
+      </div><!-- fim do card -->
+    </div><!-- fim da coluna card-form -->
+  </div><!-- fim da row -->
+</div><!-- fim da container-->
 
-<!--
-<style>
-  #imgPrev
-  background: url('https://www.osmais.com/wallpapers/201209/dia-de-chuva-wallpaper.jpg')
-  background-size: cover;
+  <script src="{{asset('/js/script.js')}}"></script>
 
-
-</style>
--->
-
-<script>
-  function loadFile(event){
-
-//    document.getElementById('imgPrev').src = URL.createObjectURL(event.target.files[0])  (jeito curto)
-
-    //variavel que recebe  o elemento img
-    var imgPrev = document.getElementById('imgPrev')
-
-    //link para a imagem
-    var url = URL.createObjectURL(event.target.files[0])
-
-    //altera a propriedade src para o link da imagem
-    imgPrev.style.background =  "url("+url+") no-repeat center"
-    imgPrev.style.background-size = "cover"
-
-  }
-</script>
 @endsection

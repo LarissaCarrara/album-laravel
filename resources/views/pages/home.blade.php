@@ -1,5 +1,4 @@
 @extends('/layouts/main')
-
 @section('content')
 <header class="text-white gradient">
   @include('/partials/navbar') {{-- incluindo a navbar --}}
@@ -25,7 +24,7 @@
        <div class="col-12 col-md-6 col-lg-4 mb-4">
       <div class="card shadow-sm h-100">
         <img class="bd-placeholder-img card-img-top"
-          src="{{url("/storage/photos/$photo->photo_url")}}" alt="">
+          src="{{url("/storage/photos/$photo->photos_url")}}" alt="">
         <div class="card-body">
           <p class="card-text">{{$photo->title}}
           <div class="d-flex justify-content-between align-items-center">

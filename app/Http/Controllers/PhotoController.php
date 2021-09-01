@@ -125,7 +125,7 @@ class PhotoController extends Controller
         $photo = Photo::findOrFail($id);
 
         //Verifica se arquivo existe
-        if(file_exists(public_path("/storage/photos/$photo->photos_url"))){
+        if(file_exists(public_path("\storage\photos\$photo->photos_url"))){
 
           //Excluir o Arquivo de imagem
           unlink(public_path("/storage/photos/$photo->photos_url"));
