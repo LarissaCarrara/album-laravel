@@ -1,4 +1,4 @@
-extends('/layouts/main')
+@extends('/layouts/main')
 
 @section('content')
 @include('/partials/navbar')
@@ -39,12 +39,12 @@ extends('/layouts/main')
                 <td>{{$photo->title}}</td>
                 <td>{{$photo->date}}</td>
                 <td>
-                  <a href="/photos/edit/{{photo->id}}" class="btn btn-secondary">
+                  <a href="/photos/edit/{{$photo->id}}" class="btn btn-secondary">
                     <i class="fas fa-edit"></i>
                   </a>
 
                   <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                    data-bs-target="#confirmationModal" data-photo-id="{{photo->id}}">
+                    data-bs-target="#confirmationModal" data-photo-id="{{$photo->id}}">
 
                     <i class="fas fa-trash-alt"></i>
 
