@@ -47,25 +47,28 @@ class PhotoController extends Controller
     $photo->title = $request->title;
     $photo->date = $request->date;
     $photo->description = $request->description;
+
     //upload
-    if($request->hasFile('photo') && $request->file('photo')){
-      //Define um nome aleatório para a foto, com base na data e hora atual
-      $nomeFoto = uniqid(date('HisYmd'));
-      //Recupera a extensão do arquivo
-      $extensao = $request->photo->extension();
-      //Nome do arquivo com extensão
-      $nomeArquivo = "{$nomeFoto}.{$extensao}";
-      //upload
-      $upload = $request->photo->move(public_path('/storage/photos'),$nomeArquivo);
-      $photo->photos_url = $nomeArquivo;
+    if($request->hasFile('photo') && $request->file('photo')->isValid()){
+
+      //Adicionando o nome do arquivo ao atributo photo_url
+      //salvando o caminho completo em uma variável
+      $upload = $this->uploadphoto($request->photo);
+
+      //dividindo a string em um array
+      $diretoryArray = explode(DIRECTORY_SEPARATOR,$upload);
+
+      //Adicionando o nome do arquivo ao atributo photo_url
+      $photo->photo_url = $diretoryArray[count($diretoryArray)-1];
     }
-    if($upload){
+
+    if($diretoryArray){
       //Inserindo no banco de dados
       $photo->save();
     }
     //Redirecionar para a página inicial
     return redirect('/');
-  }
+  }//fim do store
 
     /**
      * Display the specified resource.
@@ -124,18 +127,41 @@ class PhotoController extends Controller
         //Retorna a foto do banco de dados
         $photo = Photo::findOrFail($id);
 
-        //Verifica se arquivo existe
-        if(file_exists(public_path("\storage\photos\$photo->photos_url"))){
+        //excluir foto do armazenamento
+        $this->deletePhoto($photo-> photo_url);
 
-          //Excluir o Arquivo de imagem
-          unlink(public_path("/storage/photos/$photo->photos_url"));
-
-        }
-
-        //Excluir o registro do bd
+        //excluir foto do banco de dados
         $photo->delete();
 
         //Rediricionar para a pagina de fotos
         return redirect('/photos');
     }
-}
+
+    public function uploadPhoto($photo){
+
+    //Define um nome aleatório para a foto, com base na data e hora atual
+    $nomeFoto = sha1(uniqid(date('HisYmd')));
+
+    //Recupera a extensão do arquivo
+    $extensao = $photo->extension();
+
+    //Nome do arquivo com extensão
+    $nomeArquivo = "{$nomeFoto}.{$extensao}";
+
+    //upload
+    $upload = $photo->move(public_path('storage'.DIRECTORY_SEPARATOR.'photos'),$nomeArquivo);
+
+    return $upload;
+    }
+
+    public function deletePhoto($fileName){
+
+      //Verifica se arquivo existe
+    if(file_exists(public_path("storage".DIRECTORY_SEPARATOR."photos".DIRECTORY_SEPARATOR. $fileName))){
+
+      //Excluir o Arquivo de imagem
+        unlink(public_path("storage" .DIRECTORY_SEPARATOR. "photos" .DIRECTORY_SEPARATOR.$fileName));
+
+      } //fim do if
+    }
+}//fim do controller
