@@ -14,23 +14,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//rota da página inicial
+//Rota página inicial
 Route::get('/', [PhotoController::class, 'index']);
+Route::get('/dashboard',[PhotoController::class, 'index'])->name('dashboard');
 
-//rota que exibe as fotos do usuario
-Route::get ('/photos', [PhotoController::class, 'ShowAll']);
+Route::middleware(['auth'])->group(function(){
 
-//rota que exibe o formulário de cadastro
+//Rota que exibe as fotos do usuário
+Route::get('/photos', [PhotoController::class, 'showAll']);
+
+//Rota que exibe o formulário de cadastro
 Route::get('/photos/new', [PhotoController::class, 'create']);
 
-//rota que exibe o formulário de edição
+//Rota que exibe  formulário de edição
 Route::get('/photos/edit/{id}', [PhotoController::class, 'edit']);
 
-//rota que insere no banco de dados uma nova foto
+//Rota que insere no banco de dados uma nova foto
 Route::post('/photos', [PhotoController::class, 'store']);
 
-//rota que altera uma foto no banco de dados
-Route::put('/photos/{id}' , [PhotoController::class, 'update']);
+//Rota que altera uma foto no banco de dados
+Route::put('/photos/{id}', [PhotoController::class, 'update']);
 
-//rota que exclui uma foto do banco de dados
-Route::delete('/photos/{id}' , [PhotoController::class, 'destroy']);
+//Rota que exclui uma foto no banco de dados
+Route::delete('/photos/{id}', [PhotoController::class, 'destroy']);
+
+});

@@ -15,10 +15,10 @@ class CreatePhotosTable extends Migration
     {
         Schema::create('photos', function (Blueprint $table) {
             $table->id();
-            $table->string ('photos_url');
-            $table->string ('title');
-            $table->date ('date');
-            $table->text ('description');
+            $table->string('photo_url');
+            $table->string('title');
+            $table->date('date');
+            $table->text('description');
             $table->timestamps();
         });
     }

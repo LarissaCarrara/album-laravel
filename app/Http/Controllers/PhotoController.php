@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+//importando o model
 use App\Models\Photo;
 
 class PhotoController extends Controller
@@ -14,13 +16,15 @@ class PhotoController extends Controller
      */
     public function index()
     {
-      $photos = Photo::all();
-      return view('/pages/home',['photos'=>$photos]);
+        $photos = Photo::all();
+        return view('/pages/home', ['photos' => $photos]);
     }
 
-    public function showAll(){
-      $photos = Photo::all();
-      return view('/pages/photo_list',['photos' => $photos]);
+    //Fotos de um usuario específico
+    public function showAll()
+    {
+        $photos = Photo::all()->where('user_id', auth()->user()->id);
+        return view('/pages/photo_list', ['photos' => $photos]);
     }
 
     /**
@@ -30,7 +34,7 @@ class PhotoController extends Controller
      */
     public function create()
     {
-        return view('pages/photo_form');
+      return view('pages/photo_form');
     }
 
     /**
@@ -40,36 +44,37 @@ class PhotoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-  {
-    //Criação de um um objeto do tipo Photo
-    $photo = new Photo();
+    {
+        //Criação de um objeto do tipo Photo
+        $photo = new Photo();
 
-    //Alterando os atributos do objeto
-    $photo->title = $request->title;
-    $photo->date = $request->date;
-    $photo->description = $request->description;
+        //Alterando os atributos do objeto
+        $photo->title = $request->title;
+        $photo->date = $request->date;
+        $photo->description = $request->description;
+        $photo->user_id = auth()->user()->id;
 
-    //upload
-    if($request->hasFile('photo') && $request->file('photo')->isValid()){
+        //Upload
+        if($request->hasFile('photo') && $request->file('photo')->isValid()){
+            
+            //Salvando o caminho completo em uma variável
+            $upload = $this->uploadPhoto($request->photo);
 
-      //Salvando o caminho completo em uma variavel
-      $upload = $this->uploadPhoto($request->photo);
+            //Dividindo a string em um array
+            $directoryArray = explode(DIRECTORY_SEPARATOR, $upload);
 
-      //Dividindo a string em um array
-      $directoryArray = explode(DIRECTORY_SEPARATOR,$upload);
+            //Adicionando o nome do arquivo ao atributo photo_url
+            $photo->photo_url = end($directoryArray);
+         }
+        
+        if($directoryArray){
+            //Inserindo no banco de dados
+            $photo->save();
+        }
 
-      //Adicionando o nome do arquivo ao atributo photo_url
-      $photo->photos_url = end($directoryArray);
+        //Redirecionar para a página inicial
+        return redirect('/');
     }
-
-    if (true){
-      //Inserindo no banco de dados
-      $photo->save();
-    }
-
-    //Redirecionar para a página inicial
-    return redirect('/');
-  }
 
     /**
      * Display the specified resource.
@@ -91,7 +96,7 @@ class PhotoController extends Controller
     public function edit($id)
     {
         $photo = Photo::findOrFail($id);
-        return view('pages/photo_form',['photo'=>$photo]);
+        return view('pages/photo_form', ['photo' => $photo]);
     }
 
     /**
@@ -103,41 +108,43 @@ class PhotoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $photo = Photo::FindOrFail($request->id);
+        //Retorna a foto do banco de dados
+        $photo = Photo::findOrFail($request->id);
 
+        //Alterando os atributos do objeto
         $photo->title = $request->title;
         $photo->date = $request->date;
         $photo->description = $request->description;
 
         if($request->hasFile('photo') && $request->file('photo')->isValid()){
+            //Excluindo a foto antiga
+            $this->deletePhoto($photo->photo_url);
+            
+            //Realizando o upload da nova foto
+            //Salvando o caminho completo em uma variável
+            $upload = $this->uploadPhoto($request->photo);
 
-          //excluir foto antiga
-          $this->deletePhoto($photo->photos_url);
+            //Dividindo a string em um array
+            $directoryArray = explode(DIRECTORY_SEPARATOR, $upload);
 
-          //realizar o upload da nova foto
-          //Salvando o caminho completo em uma variavel
-          $upload = $this->uploadPhoto($request->photo);
+            //Adicionando o nome do arquivo ao atributo photo_url
+            $photo->photo_url = end($directoryArray);
 
-          //Dividindo a string em um array
-          $directoryArray = explode(DIRECTORY_SEPARATOR,$upload);
+            //Realizando o update caso tudo der certo
+            if($directoryArray){
+                //Alterando no banco de dados
+                $photo->update();
+            }
 
-          //Adicionando o nome do arquivo ao atributo photo_url
-          $photo->photos_url = end($directoryArray);
-
-
-          //Se tudo deu certo, realiza o update
-          if ($directoryArray){
-            $photo->update();//Alterando no banco de dados
-          }
-
-          //Redirecionar Para pagina Inicial
-          return redirect('/photos');
+            //Redirecionando para a página inicial
+            return redirect('/photos');
         }
 
-      $photo->update();//Alterando no banco de dados
+        //Alterando no banco de dados
+        $photo->update();
 
-      //Redirecionar Para pagina Inicial
-      return redirect('/photos');
+        //Redirecionando para a página inicial
+        return redirect('/photos');
     }
 
     /**
@@ -148,42 +155,43 @@ class PhotoController extends Controller
      */
     public function destroy($id)
     {
-        //Retorna a foto do banco de dados
+        //Retornar e excluir a foto do banco de dados
         $photo = Photo::findOrFail($id);
+        
+        //Excluir foto
+        $this->deletePhoto($photo->photo_url);
 
-        //Excluir foto do armazenamento
-        $this->deletePhoto($photo->photos_url);
-
-        //excluir foto do banco de dados
+        //Excluir o registro do BD
         $photo->delete();
 
-        //Rediricionar para a pagina de fotos
+        //Redirecionar para a página de fotos
         return redirect('/photos');
     }
 
     public function uploadPhoto($photo){
-      //Define um nome aleatório para a foto, com base na data e hora atual
-      $nomeFoto = sha1(uniqid(date('HisYmd')));
-      //Recupera a extensão do arquivo
-      $extensao = $photo->extension();
-      //Nome do arquivo com extensão
-      $nomeArquivo = "{$nomeFoto}.{$extensao}";
-      //upload
-      $upload = $photo->move(public_path(DIRECTORY_SEPARATOR.'/storage/photos'),$nomeArquivo);
-      //retorna o nome do arquivo
-      return $upload;
+       
+        //Define um nome aleatório para a foto, com base na data e hora atual
+        $nomeFoto = sha1(uniqid(date('HisYmd')));
 
+        //Recupera a extensão do arquivo
+        $extensao = $photo->extension();
+
+        //Nome do arquivo com extensão
+        $nomeArquivo = "{$nomeFoto}.{$extensao}";
+
+        //Upload
+        $upload = $photo->move(public_path("storage".DIRECTORY_SEPARATOR."photos"), $nomeArquivo);
+        
+        return $upload;
     }
 
     public function deletePhoto($fileName){
-      //Verifica se arquivo existe
+
+      //Verifica se o arquivo existe
       if(file_exists(public_path("storage".DIRECTORY_SEPARATOR."photos".DIRECTORY_SEPARATOR.$fileName))){
-
-        //Excluir o Arquivo de imagem
+            
+        //Excluir o arquivo de imagem
         unlink(public_path("storage".DIRECTORY_SEPARATOR."photos".DIRECTORY_SEPARATOR.$fileName));
-
-
-      }
+      }//Fim do if
     }
-
-}//fim controller
+}//Fim do controller
